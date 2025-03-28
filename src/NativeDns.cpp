@@ -74,8 +74,12 @@ int DNSClient::getHostByName(const char* aHostname, IPAddress& aResult, uint16_t
     if(fnet_dns_desc == FNET_NULL){
         return 0;
     }
+    uint32_t start = millis();
     while(resolveDone == 0){
-        
+        if (millis() - start >= timeout) {
+            fnet_dns_release(fnet_dns_desc);
+            return 0;
+        }
     }
     if(resolveDone == -1) return 0;
     else if(resolveDone == 1) {

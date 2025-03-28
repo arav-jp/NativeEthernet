@@ -280,11 +280,31 @@ int EthernetClient::read()
 
 void EthernetClient::flush()
 {
-	while (sockindex < Ethernet.socket_num) {
-		uint8_t stat = Ethernet.socketStatus(sockindex);
-		if (stat != SnSR::ESTABLISHED && stat != SnSR::CLOSE_WAIT) return;
-		if (Ethernet.socketSendAvailable(sockindex) >= Ethernet.socket_size) return;
-	}
+    uint32_t start_ms = millis();
+    const uint32_t timeout = 200;
+
+    while (sockindex < Ethernet.socket_num) {
+        uint8_t stat = Ethernet.socketStatus(sockindex);
+        if (stat != SnSR::ESTABLISHED && stat != SnSR::CLOSE_WAIT) {
+            Serial.printf("Socket not established %d\r\n", stat);
+            return;
+        }
+		if (Ethernet.socketSendAvailable(sockindex) >= Ethernet.socket_size) {
+            Serial.println("Socket available");
+            return;
+        } 
+        if (Ethernet.linkStatus() != LinkON) {
+            /* ARAV add: Disconnect Cable */
+            Serial.println("Link Disconnect");
+            return;
+        }
+        if (millis() - start_ms > timeout) {
+            /* ARAV add: Timeout */
+            Serial.println("Timeout");
+            stop();
+            return;
+        }
+    }
 }
 
 void EthernetClient::stop()
