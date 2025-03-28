@@ -41,7 +41,7 @@ int EthernetClient::connect(const char * host, uint16_t port)
 		sockindex = Ethernet.socket_num;
 	}
 	dns.begin(Ethernet.dnsServerIP());
-	if (!dns.getHostByName(host, remote_addr)) return 0; // TODO: use _timeout
+	if (!dns.getHostByName(host, remote_addr, 200)) return 0; // TODO: use _timeout
 #if FNET_CFG_TLS
     host_name = host;
 #endif
