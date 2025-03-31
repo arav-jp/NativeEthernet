@@ -301,7 +301,6 @@ void EthernetClient::flush()
         if (millis() - start_ms > timeout) {
             /* ARAV add: Timeout */
             // Serial.println("Timeout");
-            stop();
             return;
         }
     }
